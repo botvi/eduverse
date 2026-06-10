@@ -33,42 +33,67 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('nilai-quiz.index') }}" method="GET" class="mb-4 pb-3 border-bottom">
-                                <div class="row align-items-end">
+                            <form action="{{ route('nilai-quiz.index') }}" method="GET" class="mb-4 pb-3 border-bottom" id="filter-form">
+                                <div class="row align-items-end g-2">
                                     <div class="col-md-3">
-                                        <label>Kelas</label>
-                                        <select name="kelas" class="form-control">
+                                        <label class="form-label">Kelas Siswa</label>
+                                        <select name="kelas" class="form-control" id="filter-kelas">
                                             <option value="">Semua Kelas</option>
-                                            <option value="VII" {{ request('kelas') == 'VII' ? 'selected' : '' }}>Kelas
-                                                VII</option>
-                                            <option value="VIII" {{ request('kelas') == 'VIII' ? 'selected' : '' }}>Kelas
-                                                VIII</option>
-                                            <option value="IX" {{ request('kelas') == 'IX' ? 'selected' : '' }}>Kelas IX
-                                            </option>
+                                            @foreach ($kelasList as $k)
+                                                <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>
+                                                    {{ $k }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Mata Pelajaran</label>
-                                        <select name="mapel_id" class="form-control">
+                                        <label class="form-label">Mata Pelajaran</label>
+                                        <select name="mapel_id" class="form-control" id="filter-mapel">
                                             <option value="">Semua Mapel</option>
                                             @foreach ($mapels as $mapel)
                                                 <option value="{{ $mapel->id }}"
-                                                    {{ request('mapel_id') == $mapel->id ? 'selected' : '' }}>
-                                                    {{ $mapel->nama_mapel }} - Kelas {{ $mapel->kelas }}</option>
+                                                    data-kelas="{{ $mapel->kelas }}"
+                                                    {{ $mapelFilter == $mapel->id ? 'selected' : '' }}>
+                                                    {{ $mapel->nama_mapel }} - Kelas {{ $mapel->kelas }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <label>Waktu Pengerjaan</label>
+                                        <label class="form-label">Waktu Pengerjaan</label>
                                         <input type="date" name="tanggal" class="form-control"
-                                            value="{{ request('tanggal') }}">
+                                            value="{{ $tanggalFilter }}">
                                     </div>
-                                    <div class="col-md-2">
-                                        <button type="submit" class="btn btn-secondary w-100"><i class="fas fa-filter"></i>
-                                            Filter</button>
+                                    <div class="col-md-1">
+                                        <button type="submit" class="btn btn-secondary w-100">
+                                            <i class="fas fa-filter"></i> Filter
+                                        </button>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <a href="{{ route('nilai-quiz.index') }}" class="btn btn-outline-secondary w-100">
+                                            <i class="fas fa-times"></i> Reset
+                                        </a>
                                     </div>
                                 </div>
                             </form>
+
+                            {{-- Info filter aktif --}}
+                            @if ($kelasFilter || $mapelFilter || $tanggalFilter)
+                                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-3" style="font-size:0.88em;">
+                                    <i class="fas fa-filter"></i>
+                                    <div>
+                                        <strong>Filter aktif:</strong>
+                                        @if($kelasFilter) <span class="badge bg-primary ms-1">Kelas: {{ $kelasFilter }}</span> @endif
+                                        @if($mapelFilter)
+                                            @php $mp = $mapels->firstWhere('id', $mapelFilter); @endphp
+                                            <span class="badge bg-info text-dark ms-1">Mapel: {{ $mp->nama_mapel ?? '-' }}</span>
+                                        @endif
+                                        @if($tanggalFilter) <span class="badge bg-secondary ms-1">Tanggal: {{ \Carbon\Carbon::parse($tanggalFilter)->format('d M Y') }}</span> @endif
+                                        &nbsp;–&nbsp; Menampilkan <strong>{{ $nilais->count() }}</strong> data
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="dt-responsive table-responsive">
                                 <table id="simpletable" class="table table-striped table-bordered nowrap">
                                     <thead>
@@ -102,18 +127,14 @@
                                                 <td>
                                                     @if ($item->is_remedial)
                                                         @if ($item->nilai_quiz >= 72)
-                                                            {{-- Sudah remedial dan lulus --}}
                                                             <span class="badge" style="background-color:#f39c12;">&#10003; Lulus Setelah Remedial</span>
                                                         @else
-                                                            {{-- Sedang/sudah remedial tapi masih belum lulus --}}
                                                             <span class="badge bg-danger">&#8635; Remedial – Belum Lulus</span>
                                                         @endif
                                                     @else
                                                         @if ($item->nilai_quiz >= 72)
-                                                            {{-- Lulus normal tanpa remedial --}}
                                                             <span class="badge bg-success">&#10003; Lulus</span>
                                                         @else
-                                                            {{-- Belum remedial, nilai kurang --}}
                                                             <span class="badge bg-secondary">&#9888; Perlu Remedial</span>
                                                         @endif
                                                     @endif
@@ -144,10 +165,38 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Filter mapel berdasarkan kelas yang dipilih
+            const kelasSelect = document.getElementById('filter-kelas');
+            const mapelSelect = document.getElementById('filter-mapel');
+            const allMapelOptions = Array.from(mapelSelect.querySelectorAll('option[data-kelas]'));
+
+            function filterMapel(selectedKelas) {
+                const currentVal = mapelSelect.value;
+                allMapelOptions.forEach(opt => {
+                    if (!selectedKelas || opt.dataset.kelas.startsWith(selectedKelas.split(' ')[0])) {
+                        opt.style.display = '';
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                });
+                // Reset mapel jika opsi yang dipilih tidak tersedia
+                const visible = allMapelOptions.find(o => o.value === currentVal && o.style.display !== 'none');
+                if (!visible && selectedKelas) {
+                    mapelSelect.value = '';
+                }
+            }
+
+            kelasSelect.addEventListener('change', function () {
+                filterMapel(this.value);
+            });
+
+            // Jalankan saat load untuk menjaga state filter
+            filterMapel(kelasSelect.value);
+
+            // Konfirmasi hapus
             document.querySelectorAll('.delete-form').forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-
                     Swal.fire({
                         title: 'Apakah Anda yakin?',
                         text: "Data ini akan dihapus secara permanen!",

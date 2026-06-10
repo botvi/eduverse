@@ -44,9 +44,9 @@
                             <div class="row align-items-end g-2">
                                 <div class="col-md-3">
                                     <label class="form-label">Kelas</label>
-                                    <select name="kelas" class="form-control">
+                                    <select name="kelas" class="form-control" id="filter-kelas-akhir">
                                         <option value="">Semua Kelas</option>
-                                        @foreach(['VII A','VII B','VII C','VIII A','VIII B','VIII C','IX A','IX B','IX C'] as $k)
+                                        @foreach(\App\Models\Siswa::distinct()->orderBy('kelas')->pluck('kelas') as $k)
                                             <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>
                                                 {{ $k }}
                                             </option>
@@ -55,10 +55,11 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Mata Pelajaran</label>
-                                    <select name="mapel_id" class="form-control">
+                                    <select name="mapel_id" class="form-control" id="filter-mapel-akhir">
                                         <option value="">Semua Mapel</option>
                                         @foreach($mapels as $mapel)
                                             <option value="{{ $mapel->id }}"
+                                                data-kelas="{{ $mapel->kelas }}"
                                                 {{ $mapelFilter == $mapel->id ? 'selected' : '' }}>
                                                 {{ $mapel->nama_mapel }} – Kelas {{ $mapel->kelas }}
                                             </option>
@@ -77,6 +78,22 @@
                                 </div>
                             </div>
                         </form>
+
+                        {{-- Info filter aktif --}}
+                        @if ($kelasFilter || $mapelFilter)
+                            <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-3" style="font-size:0.88em;">
+                                <i class="fas fa-filter"></i>
+                                <div>
+                                    <strong>Filter aktif:</strong>
+                                    @if($kelasFilter) <span class="badge bg-primary ms-1">Kelas: {{ $kelasFilter }}</span> @endif
+                                    @if($mapelFilter)
+                                        @php $mp = $mapels->firstWhere('id', $mapelFilter); @endphp
+                                        <span class="badge bg-info text-dark ms-1">Mapel: {{ $mp->nama_mapel ?? '-' }}</span>
+                                    @endif
+                                    &nbsp;–&nbsp; Menampilkan <strong>{{ count($hasil) }}</strong> data
+                                </div>
+                            </div>
+                        @endif
 
                         {{-- Keterangan Formula --}}
                         <div class="alert alert-info d-flex align-items-start gap-2 mb-3" style="font-size:0.88em;">
@@ -244,6 +261,38 @@
             pageLength: 25,
             order: [[2, 'asc'], [1, 'asc']],
         });
+    });
+
+    // Filter mapel berdasarkan kelas yang dipilih
+    document.addEventListener('DOMContentLoaded', function () {
+        const kelasSelect = document.getElementById('filter-kelas-akhir');
+        const mapelSelect = document.getElementById('filter-mapel-akhir');
+        if (!kelasSelect || !mapelSelect) return;
+
+        const allMapelOptions = Array.from(mapelSelect.querySelectorAll('option[data-kelas]'));
+
+        function filterMapelAkhir(selectedKelas) {
+            const currentVal = mapelSelect.value;
+            allMapelOptions.forEach(opt => {
+                if (!selectedKelas || opt.dataset.kelas === selectedKelas) {
+                    opt.style.display = '';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+            // Reset mapel jika opsi yang dipilih tidak cocok kelas
+            const visible = allMapelOptions.find(o => o.value === currentVal && o.style.display !== 'none');
+            if (!visible && selectedKelas) {
+                mapelSelect.value = '';
+            }
+        }
+
+        kelasSelect.addEventListener('change', function () {
+            filterMapelAkhir(this.value);
+        });
+
+        // Jalankan saat load untuk menjaga state filter
+        filterMapelAkhir(kelasSelect.value);
     });
 </script>
 @endsection

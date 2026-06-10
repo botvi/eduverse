@@ -61,7 +61,7 @@
                                     <label class="form-label fw-semibold">Filter Kelas</label>
                                     <select name="kelas" class="form-control">
                                         <option value="">Semua Kelas</option>
-                                        @foreach(['VII A','VII B','VII C','VIII A','VIII B','VIII C','IX A','IX B','IX C'] as $k)
+                                        @foreach(\App\Models\Siswa::distinct()->orderBy('kelas')->pluck('kelas') as $k)
                                             <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>{{ $k }}</option>
                                         @endforeach
                                     </select>
