@@ -11,10 +11,19 @@ use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $siswas = Siswa::with('user')->latest()->get();
-        return view('pagesuperadmin.data_siswa.index', compact('siswas'));
+        $query = Siswa::with('user')->latest();
+        $kelasFilter = $request->query('kelas');
+
+        if ($request->filled('kelas')) {
+            $query->where('kelas', $kelasFilter);
+        }
+
+        $siswas = $query->get();
+        $kelasList = ['VII A', 'VII B', 'VII C', 'VIII A', 'VIII B', 'VIII C', 'IX A', 'IX B', 'IX C'];
+
+        return view('pagesuperadmin.data_siswa.index', compact('siswas', 'kelasList', 'kelasFilter'));
     }
 
     public function create()

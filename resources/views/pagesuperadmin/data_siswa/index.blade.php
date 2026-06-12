@@ -30,6 +30,42 @@
                 <a href="{{ route('siswa.create') }}" class="btn btn-primary">Tambah Siswa</a>
             </div>
             <div class="card-body">
+              <!-- Filter Kelas -->
+              <form action="{{ route('siswa.index') }}" method="GET" class="mb-4 pb-3 border-bottom" id="filter-form">
+                <div class="row align-items-end g-2">
+                  <div class="col-md-4">
+                    <label class="form-label fw-bold">Filter Kelas</label>
+                    <select name="kelas" class="form-control" id="filter-kelas" onchange="document.getElementById('filter-form').submit()">
+                      <option value="">Semua Kelas</option>
+                      @foreach ($kelasList as $k)
+                        <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>
+                          {{ $k }}
+                        </option>
+                      @endforeach
+                    </select>
+                  </div>
+                  @if($kelasFilter)
+                  <div class="col-md-2">
+                    <a href="{{ route('siswa.index') }}" class="btn btn-outline-secondary w-100">
+                      <i class="fas fa-times"></i> Reset Filter
+                    </a>
+                  </div>
+                  @endif
+                </div>
+              </form>
+
+              {{-- Info filter aktif --}}
+              @if ($kelasFilter)
+                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-3" style="font-size:0.88em;">
+                  <i class="fas fa-filter"></i>
+                  <div>
+                    <strong>Filter aktif:</strong>
+                    <span class="badge bg-primary ms-1">Kelas: {{ $kelasFilter }}</span>
+                    &nbsp;–&nbsp; Menampilkan <strong>{{ $siswas->count() }}</strong> siswa
+                  </div>
+                </div>
+              @endif
+
               <div class="dt-responsive table-responsive">
                 <table id="simpletable" class="table table-striped table-bordered nowrap">
                   <thead>
