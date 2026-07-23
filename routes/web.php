@@ -21,6 +21,7 @@ use App\Http\Controllers\superadmin\{
     MapelController,
     NilaiAkhirController,
     NilaiUjianController,
+    KuesionerAdminController,
 };
 use App\Http\Controllers\user\{
     PreviewController,
@@ -32,6 +33,7 @@ use App\Http\Controllers\user\{
     TestimoniController,
     PaketController,
     UserMateriController,
+    KuesionerController,
 };
 use App\Http\Controllers\auth\{
     LoginController,
@@ -91,6 +93,11 @@ Route::group(['middleware' => ['role:superadmin']], function () {
     Route::get('nilai-akhir/print', [NilaiAkhirController::class, 'print'])->name('nilai-akhir.print');
     Route::get('nilai-akhir/input-nilai', [NilaiAkhirController::class, 'inputNilai'])->name('nilai-akhir.input-nilai');
     Route::post('nilai-akhir/simpan-nilai', [NilaiAkhirController::class, 'simpanNilai'])->name('nilai-akhir.simpan-nilai');
+
+    // Kuesioner Admin
+    Route::get('kuesioner-admin', [KuesionerAdminController::class, 'index'])->name('admin.kuesioner.index');
+    Route::get('kuesioner-admin/{kuesioner}', [KuesionerAdminController::class, 'show'])->name('admin.kuesioner.show');
+    Route::delete('kuesioner-admin/{kuesioner}', [KuesionerAdminController::class, 'destroy'])->name('admin.kuesioner.destroy');
 });
 
 
@@ -118,4 +125,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/game', [App\Http\Controllers\user\GameController::class, 'index'])->name('user.game');
     Route::post('/game/save', [App\Http\Controllers\user\GameController::class, 'saveProgress'])->name('user.game.save');
+
+    // Kuesioner User
+    Route::get('/kuesioner/{jenis}', [KuesionerController::class, 'show'])->name('user.kuesioner.show');
+    Route::post('/kuesioner/{jenis}', [KuesionerController::class, 'store'])->name('user.kuesioner.store');
 });

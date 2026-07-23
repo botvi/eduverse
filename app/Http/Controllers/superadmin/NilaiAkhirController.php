@@ -23,13 +23,17 @@ class NilaiAkhirController extends Controller
     {
         $kelasFilter  = $request->input('kelas');
         $mapelFilter  = $request->input('mapel_id');
+        $tahunFilter  = $request->input('tahun_ajaran');
 
         $mapels = Mapel::orderBy('kelas')->orderBy('nama_mapel')->get();
 
-        // Ambil semua siswa (filter kelas jika ada)
+        // Ambil semua siswa (filter kelas & tahun ajaran jika ada)
         $siswaQuery = Siswa::with('user');
         if ($kelasFilter) {
             $siswaQuery->where('kelas', $kelasFilter);
+        }
+        if ($tahunFilter) {
+            $siswaQuery->where('tahun_ajaran', $tahunFilter);
         }
         $siswas = $siswaQuery->orderBy('kelas')->orderBy('nama_lengkap')->get();
 

@@ -77,6 +77,12 @@
                             <span class="pc-mtext">Nilai Akhir</span>
                         </a>
                     </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.kuesioner.index') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-clipboard-check"></i></span>
+                            <span class="pc-mtext">Rekap Kuesioner</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         @endif

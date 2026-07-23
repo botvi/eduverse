@@ -36,9 +36,11 @@
                     <tr>
                       <th>No</th>
                       <th>Judul Ujian</th>
+                      <th>Jenis</th>
                       <th>Mapel</th>
                       <th>Kelas</th>
                       <th>Jumlah Soal</th>
+                      <th>Jam Ujian</th>
                       <th>Status</th>
                       <th>Aksi</th>
                     </tr>
@@ -48,9 +50,30 @@
                     <tr>
                       <td>{{ $i+1 }}</td>
                       <td>{{ $item->judul }}</td>
+                      <td>
+                        @if(($item->jenis_ujian ?? 'Lainnya') === 'UTS')
+                          <span class="badge bg-warning text-dark">UTS</span>
+                        @elseif(($item->jenis_ujian ?? 'Lainnya') === 'UAS')
+                          <span class="badge bg-danger">UAS</span>
+                        @else
+                          <span class="badge bg-secondary">Lainnya</span>
+                        @endif
+                      </td>
                       <td>{{ $item->mapel->nama_mapel ?? '-' }}</td>
                       <td>{{ $item->mapel->kelas ?? '-' }}</td>
                       <td>{{ is_array($item->soal) ? count($item->soal) : 0 }} Soal</td>
+                      <td>
+                        @if($item->jam_mulai || $item->jam_selesai)
+                          <small class="text-primary">
+                            <i class="fas fa-clock"></i>
+                            {{ $item->jam_mulai ? \Carbon\Carbon::createFromFormat('H:i:s', $item->jam_mulai)->format('H:i') : '–' }}
+                            –
+                            {{ $item->jam_selesai ? \Carbon\Carbon::createFromFormat('H:i:s', $item->jam_selesai)->format('H:i') : '–' }}
+                          </small>
+                        @else
+                          <span class="text-muted small">–</span>
+                        @endif
+                      </td>
                       <td>
                           @if($item->status == 'dimulai')
                               <span class="badge bg-success">Dimulai</span>

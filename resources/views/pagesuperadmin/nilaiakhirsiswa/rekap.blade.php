@@ -42,7 +42,7 @@
                         {{-- Filter --}}
                         <form action="{{ route('nilai-akhir.index') }}" method="GET" class="mb-4 pb-3 border-bottom">
                             <div class="row align-items-end g-2">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Kelas</label>
                                     <select name="kelas" class="form-control" id="filter-kelas-akhir">
                                         <option value="">Semua Kelas</option>
@@ -53,7 +53,18 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-2">
+                                    <label class="form-label">Tahun Ajaran</label>
+                                    <select name="tahun_ajaran" class="form-control" id="filter-tahun-akhir">
+                                        <option value="">Semua Tahun</option>
+                                        @foreach(['2023-2024','2024-2025','2025-2026','2026-2027','2027-2028'] as $ta)
+                                            <option value="{{ $ta }}" {{ (request('tahun_ajaran') ?? '') == $ta ? 'selected' : '' }}>
+                                                {{ $ta }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
                                     <label class="form-label">Mata Pelajaran</label>
                                     <select name="mapel_id" class="form-control" id="filter-mapel-akhir">
                                         <option value="">Semua Mapel</option>

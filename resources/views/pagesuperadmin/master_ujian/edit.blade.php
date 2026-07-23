@@ -41,7 +41,17 @@
                                     <input type="text" name="judul" class="form-control" value="{{ $ujian->judul }}"
                                         required>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Jenis Ujian</label>
+                                    <select name="jenis_ujian" class="form-control" required>
+                                        @foreach(['Lainnya', 'UTS', 'UAS'] as $jenis)
+                                            <option value="{{ $jenis }}" {{ ($ujian->jenis_ujian ?? 'Lainnya') == $jenis ? 'selected' : '' }}>
+                                                {{ $jenis === 'UTS' ? 'UTS (Ujian Tengah Semester)' : ($jenis === 'UAS' ? 'UAS (Ujian Akhir Semester)' : 'Lainnya') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
                                     <label class="form-label">Status Ujian</label>
                                     <select name="status" class="form-control" required>
                                         <option value="belum dimulai"
@@ -49,6 +59,19 @@
                                         <option value="dimulai" {{ $ujian->status == 'dimulai' ? 'selected' : '' }}>Dimulai
                                         </option>
                                     </select>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group mb-3">
+                                        <label class="form-label fw-semibold">Jam Mulai <small class="text-muted">(opsional)</small></label>
+                                        <input type="time" name="jam_mulai" class="form-control" value="{{ $ujian->jam_mulai ?? '' }}">
+                                        <small class="text-muted">Siswa tidak bisa mengakses ujian sebelum jam ini.</small>
+                                    </div>
+                                    <div class="col-md-6 form-group mb-3">
+                                        <label class="form-label fw-semibold">Jam Selesai <small class="text-muted">(opsional)</small></label>
+                                        <input type="time" name="jam_selesai" class="form-control" value="{{ $ujian->jam_selesai ?? '' }}">
+                                        <small class="text-muted">Siswa tidak bisa mengakses ujian setelah jam ini.</small>
+                                    </div>
                                 </div>
 
                                 {{-- ===================== PILIH MAPEL MULTI ===================== --}}

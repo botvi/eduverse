@@ -83,6 +83,17 @@
                                         <input type="text" name="alamat" class="form-control"
                                             value="{{ $siswa->alamat }}" required>
                                     </div>
+                                    <div class="col-md-6 form-group">
+                                        <label class="form-label">Tahun Ajaran <span class="text-danger">*</span></label>
+                                        <select name="tahun_ajaran" class="form-control" required>
+                                            <option value="">-- Pilih Tahun Ajaran --</option>
+                                            @foreach(['2023-2024','2024-2025','2025-2026','2026-2027','2027-2028'] as $ta)
+                                                <option value="{{ $ta }}" {{ ($siswa->tahun_ajaran ?? '') == $ta ? 'selected' : '' }}>
+                                                    {{ $ta }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                                 <hr>
                                 <h6>Akun Login</h6>

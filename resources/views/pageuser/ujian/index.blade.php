@@ -231,6 +231,19 @@
             border-color: var(--neon-g);
         }
 
+        .exam-card.locked-time {
+            opacity: .75;
+            pointer-events: none;
+            cursor: not-allowed;
+            border-color: var(--neon-r);
+            border-style: dashed;
+        }
+
+        .exam-card.locked-time .exam-icon {
+            color: var(--neon-r);
+            filter: drop-shadow(0 0 8px var(--neon-r));
+        }
+
         .exam-icon {
             font-size: 2.5em;
             margin-bottom: 14px;
@@ -364,23 +377,54 @@
                     $score = $isDone ? $nilaiUjians[$ujian->id]->nilai_ujian : null;
                     $isRemedial = $isDone && $nilaiUjians[$ujian->id]->is_remedial;
                     $belowKkm = $isDone && $score < 72;
-                    // Card is "done" (non-clickable for retake) if score >= 72 or already remedial
                     $cardDone = $isDone && ($score >= 72 || $isRemedial);
+
+                    // Cek jam ujian
+                    $jamMulai   = $ujian->jam_mulai;
+                    $jamSelesai = $ujian->jam_selesai;
+                    $jamSekarang = \Carbon\Carbon::now()->format('H:i:s');
+                    $diLuarJam = false;
+                    $pesanJam  = '';
+                    if ($jamMulai && $jamSekarang < $jamMulai) {
+                        $diLuarJam = true;
+                        $pesanJam  = 'Mulai ' . \Carbon\Carbon::createFromFormat('H:i:s', $jamMulai)->format('H:i');
+                    } elseif ($jamSelesai && $jamSekarang > $jamSelesai) {
+                        $diLuarJam = true;
+                        $pesanJam  = 'Berakhir ' . \Carbon\Carbon::createFromFormat('H:i:s', $jamSelesai)->format('H:i');
+                    }
                 @endphp
-                <a href="{{ $cardDone ? '#' : route('user.ujian.show', $ujian->id) }}"
-                    class="exam-card {{ $cardDone ? 'done' : '' }}">
+                <a href="{{ ($cardDone || $diLuarJam) ? '#' : route('user.ujian.show', $ujian->id) }}"
+                    class="exam-card {{ $cardDone ? 'done' : ($diLuarJam ? 'locked-time' : '') }}">
                     <span class="exam-icon">
                         <i
-                            class="fas fa-{{ $cardDone ? 'check-circle' : ($isDone ? 'exclamation-circle' : 'file-signature') }}"></i>
+                            class="fas fa-{{ $cardDone ? 'check-circle' : ($diLuarJam ? 'clock' : ($isDone ? 'exclamation-circle' : 'file-signature')) }}"></i>
                     </span>
                     <div class="exam-title">{{ $ujian->judul }}</div>
                     <div>
+                        @if($ujian->jenis_ujian && $ujian->jenis_ujian !== 'Lainnya')
+                            <span class="exam-meta-chip" style="background:rgba(234,179,8,.12);border-color:#eab308;color:#854d0e;font-weight:800;">
+                                <i class="fas fa-star"></i> {{ $ujian->jenis_ujian }}
+                            </span>
+                        @endif
                         <span class="exam-meta-chip"><i class="fas fa-book"></i>
                             {{ $ujian->mapel->nama_mapel ?? '-' }}</span>
                         <span class="exam-meta-chip"><i class="fas fa-users"></i> Kelas
                             {{ $ujian->mapel->kelas ?? '-' }}</span>
                         <span class="exam-meta-chip">{{ is_array($ujian->soal) ? count($ujian->soal) : 0 }} Soal</span>
+                        @if($ujian->jam_mulai || $ujian->jam_selesai)
+                            <span class="exam-meta-chip" style="color:#0ea5e9;border-color:#0ea5e9;">
+                                <i class="fas fa-clock"></i>
+                                @if($ujian->jam_mulai) {{ \Carbon\Carbon::createFromFormat('H:i:s', $ujian->jam_mulai)->format('H:i') }} @endif
+                                @if($ujian->jam_mulai && $ujian->jam_selesai) – @endif
+                                @if($ujian->jam_selesai) {{ \Carbon\Carbon::createFromFormat('H:i:s', $ujian->jam_selesai)->format('H:i') }} @endif
+                            </span>
+                        @endif
                     </div>
+                    @if($diLuarJam && !$isDone)
+                        <div style="margin-top:8px;font-size:.75em;color:#f43f5e;font-weight:800;">
+                            <i class="fas fa-lock"></i> {{ $pesanJam }}
+                        </div>
+                    @endif
                     @if ($isDone)
                         <div class="exam-score" style="color:{{ $score >= 72 ? 'var(--neon-g)' : 'var(--neon-r)' }}">
                             NILAI: {{ $score }}

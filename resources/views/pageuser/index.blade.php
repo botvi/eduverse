@@ -342,6 +342,24 @@
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
             background: rgba(255, 215, 0, 0.07);
         }
+
+        .mc-teal {
+            border-color: #06b6d4;
+        }
+        .mc-teal .icon { color: #06b6d4; }
+        .mc-teal:hover {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+            background: rgba(6, 182, 212, 0.07);
+        }
+
+        .mc-orange {
+            border-color: #f97316;
+        }
+        .mc-orange .icon { color: #f97316; }
+        .mc-orange:hover {
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.3);
+            background: rgba(249, 115, 22, 0.07);
+        }
     </style>
 </head>
 
@@ -403,6 +421,18 @@
             <span class="icon"><i class="fas fa-user-astronaut"></i></span>
             <div class="label">Profil</div>
         </a>
+
+        @auth
+        <a href="{{ route('user.kuesioner.show', 'pre_test') }}" class="menu-card mc-teal">
+            <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+            <div class="label">Angket Pre-Test</div>
+        </a>
+
+        <a href="{{ route('user.kuesioner.show', 'post_test') }}" class="menu-card mc-orange">
+            <span class="icon"><i class="fas fa-poll-h"></i></span>
+            <div class="label">Angket Post-Test</div>
+        </a>
+        @endauth
     </div>
 
 </body>

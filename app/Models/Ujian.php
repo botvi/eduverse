@@ -14,6 +14,9 @@ class Ujian extends Model
         'judul',
         'soal',
         'status',
+        'jam_mulai',
+        'jam_selesai',
+        'jenis_ujian',
     ];
 
     protected $casts = [

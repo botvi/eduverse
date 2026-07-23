@@ -15,6 +15,7 @@ class Siswa extends Model
         'nama_lengkap',
         'alamat',
         'kelas',
+        'tahun_ajaran',
         'nilai_absensi',
         'nilai_sikap',
     ];

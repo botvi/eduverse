@@ -29,6 +29,9 @@ class UjianController extends Controller
             'mapel_ids.*'         => 'required|exists:mapels,id',
             'judul'               => 'required|string|max:255',
             'status'              => 'required|in:dimulai,belum dimulai',
+            'jenis_ujian'         => 'required|in:UTS,UAS,Lainnya',
+            'jam_mulai'           => 'nullable|date_format:H:i',
+            'jam_selesai'         => 'nullable|date_format:H:i|after:jam_mulai',
             'pertanyaan'          => 'nullable|array',
             'a'                   => 'nullable|array',
             'b'                   => 'nullable|array',
@@ -47,6 +50,7 @@ class UjianController extends Controller
             'gambar_d.*'          => 'nullable|image|max:2048',
         ], [
             'mapel_ids.required' => 'Pilih minimal satu mapel / kelas.',
+            'jam_selesai.after'  => 'Jam selesai harus setelah jam mulai.',
         ]);
 
         // Proses semua soal + upload gambar sekali dulu
@@ -103,10 +107,13 @@ class UjianController extends Controller
             }
 
             Ujian::create([
-                'mapel_id' => $mapel_id,
-                'judul'    => $request->judul,
-                'status'   => $request->status,
-                'soal'     => $soalForThis,
+                'mapel_id'    => $mapel_id,
+                'judul'       => $request->judul,
+                'status'      => $request->status,
+                'jenis_ujian' => $request->jenis_ujian,
+                'jam_mulai'   => $request->jam_mulai ?: null,
+                'jam_selesai' => $request->jam_selesai ?: null,
+                'soal'        => $soalForThis,
             ]);
             $count++;
         }
@@ -128,6 +135,9 @@ class UjianController extends Controller
             'mapel_ids.*'         => 'required|exists:mapels,id',
             'judul'               => 'required|string|max:255',
             'status'              => 'required|in:dimulai,belum dimulai',
+            'jenis_ujian'         => 'required|in:UTS,UAS,Lainnya',
+            'jam_mulai'           => 'nullable|date_format:H:i',
+            'jam_selesai'         => 'nullable|date_format:H:i|after:jam_mulai',
             'pertanyaan'          => 'nullable|array',
             'a'                   => 'nullable|array',
             'b'                   => 'nullable|array',
@@ -146,6 +156,7 @@ class UjianController extends Controller
             'gambar_d.*'          => 'nullable|image|max:2048',
         ], [
             'mapel_ids.required' => 'Pilih minimal satu mapel / kelas.',
+            'jam_selesai.after'  => 'Jam selesai harus setelah jam mulai.',
         ]);
 
         $soal       = [];
@@ -184,10 +195,13 @@ class UjianController extends Controller
 
         // Update record utama
         $ujian->update([
-            'mapel_id' => $mapelPrimary,
-            'judul'    => $request->judul,
-            'status'   => $request->status,
-            'soal'     => $soal,
+            'mapel_id'    => $mapelPrimary,
+            'judul'       => $request->judul,
+            'status'      => $request->status,
+            'jenis_ujian' => $request->jenis_ujian,
+            'jam_mulai'   => $request->jam_mulai ?: null,
+            'jam_selesai' => $request->jam_selesai ?: null,
+            'soal'        => $soal,
         ]);
 
         // Duplikasi ke mapel tambahan
@@ -213,10 +227,13 @@ class UjianController extends Controller
             unset($item);
 
             Ujian::create([
-                'mapel_id' => $mapelId,
-                'judul'    => $request->judul,
-                'status'   => $request->status,
-                'soal'     => $soalForThis,
+                'mapel_id'    => $mapelId,
+                'judul'       => $request->judul,
+                'status'      => $request->status,
+                'jenis_ujian' => $request->jenis_ujian,
+                'jam_mulai'   => $request->jam_mulai ?: null,
+                'jam_selesai' => $request->jam_selesai ?: null,
+                'soal'        => $soalForThis,
             ]);
             $dupCount++;
         }

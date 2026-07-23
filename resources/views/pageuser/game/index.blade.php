@@ -411,12 +411,31 @@
             border: 1px solid var(--nb);
             transform: rotateY(180deg);
             overflow: hidden;
+            flex-direction: column;
         }
 
         .cb img {
             width: 100%;
-            height: 100%;
+            flex: 1;
             object-fit: cover;
+            min-height: 0;
+        }
+
+        .cb-label {
+            font-size: 0.6em;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            color: var(--tx);
+            background: rgba(255,255,255,0.92);
+            text-align: center;
+            padding: 3px 4px;
+            line-height: 1.2;
+            border-top: 1px solid var(--border);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            flex-shrink: 0;
         }
 
         .card.matched .cb {
@@ -686,6 +705,28 @@
             'https://i.pinimg.com/1200x/79/f0/c8/79f0c8f29e2d532a7fe72819a1940a3e.jpg',
         ];
 
+        // Nama komponen untuk setiap gambar (urutan sama dengan IMGS)
+        var IMG_NAMES = [
+            'CPU (Prosesor)',
+            'Hard Disk (HDD)',
+            'GPU (Kartu Grafis)',
+            'RAM (Memori)',
+            'Hard Drive 500GB',
+            'SSD (Solid State Drive)',
+            'PSU (Catu Daya)',
+            'Mouse',
+            'Keyboard',
+            'Monitor (LCD)',
+            'Kipas (Fan)',
+            'Casing Komputer',
+            'Webcam',
+            'Mikrofon',
+            'Router / Switch',
+            'Sound Card',
+            'Network Card (LAN)',
+            'Printer',
+        ];
+
         // ── AUDIO ─────────────────────────────
         var AC, muted = false,
             bgNodes = [];
@@ -833,15 +874,17 @@
         function buildBoard(pairs) {
             var b = document.getElementById('board');
             b.innerHTML = '';
-            var imgs = shuffle(IMGS.slice()).slice(0, pairs);
-            var cards = shuffle(imgs.concat(imgs));
+            var idxPool = shuffle(Array.from({length: IMGS.length}, (_, i) => i)).slice(0, pairs);
+            var cards = shuffle(idxPool.concat(idxPool));
             var cols = pairs <= 8 ? 4 : 5;
             b.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
-            cards.forEach(function(src) {
+            cards.forEach(function(imgIdx) {
+                var src  = IMGS[imgIdx];
+                var name = IMG_NAMES[imgIdx] || '';
                 var c = document.createElement('div');
                 c.className = 'card';
                 c.innerHTML = '<div class="cf"><i class="fas fa-microchip"></i></div>' +
-                    '<div class="cb"><img src="' + src + '" loading="lazy"></div>';
+                    '<div class="cb"><img src="' + src + '" loading="lazy"><span class="cb-label">' + name + '</span></div>';
                 c.dataset.img = src;
                 c.addEventListener('click', flip);
                 b.appendChild(c);
@@ -865,7 +908,7 @@
         }
 
         function checkMatch() {
-            var ok = first.dataset.img === second.dataset.img;
+            var ok = first.dataset.img === second.dataset.img && first !== second;
             var f = first,
                 s = second;
             if (ok) {

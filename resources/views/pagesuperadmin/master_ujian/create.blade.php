@@ -41,11 +41,33 @@
                 </div>
 
                 <div class="form-group mb-3">
+                    <label class="form-label fw-semibold">Jenis Ujian</label>
+                    <select name="jenis_ujian" class="form-control" required>
+                        <option value="Lainnya">Lainnya</option>
+                        <option value="UTS">UTS (Ujian Tengah Semester)</option>
+                        <option value="UAS">UAS (Ujian Akhir Semester)</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
                     <label class="form-label fw-semibold">Status Ujian</label>
                     <select name="status" class="form-control" required>
                         <option value="belum dimulai">Belum Dimulai</option>
                         <option value="dimulai">Dimulai</option>
                     </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group mb-3">
+                        <label class="form-label fw-semibold">Jam Mulai <small class="text-muted">(opsional)</small></label>
+                        <input type="time" name="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}">
+                        <small class="text-muted">Siswa tidak bisa mengakses ujian sebelum jam ini.</small>
+                    </div>
+                    <div class="col-md-6 form-group mb-3">
+                        <label class="form-label fw-semibold">Jam Selesai <small class="text-muted">(opsional)</small></label>
+                        <input type="time" name="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}">
+                        <small class="text-muted">Siswa tidak bisa mengakses ujian setelah jam ini.</small>
+                    </div>
                 </div>
 
                 {{-- ===================== PILIH MAPEL MULTI ===================== --}}
