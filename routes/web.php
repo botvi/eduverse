@@ -96,6 +96,7 @@ Route::group(['middleware' => ['role:superadmin']], function () {
 
     // Kuesioner Admin
     Route::get('kuesioner-admin', [KuesionerAdminController::class, 'index'])->name('admin.kuesioner.index');
+    Route::get('kuesioner-admin/print', [KuesionerAdminController::class, 'print'])->name('admin.kuesioner.print');
     Route::get('kuesioner-admin/{kuesioner}', [KuesionerAdminController::class, 'show'])->name('admin.kuesioner.show');
     Route::delete('kuesioner-admin/{kuesioner}', [KuesionerAdminController::class, 'destroy'])->name('admin.kuesioner.destroy');
 });

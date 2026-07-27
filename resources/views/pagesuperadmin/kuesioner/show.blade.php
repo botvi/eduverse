@@ -71,18 +71,7 @@
 
             {{-- Tabel Jawaban --}}
             @php
-            $pertanyaan = [
-              1  => 'Saya merasa senang belajar menggunakan aplikasi ini.',
-              2  => 'Aplikasi ini membuat saya lebih semangat dalam belajar.',
-              3  => 'Belajar dengan aplikasi ini lebih menyenangkan dibandingkan buku biasa.',
-              4  => 'Saya ingin terus menggunakan aplikasi ini untuk belajar.',
-              5  => 'Aplikasi ini membantu saya memahami materi pelajaran lebih mudah.',
-              6  => 'Saya merasa aplikasi ini menarik dan tidak membosankan.',
-              7  => 'Game dan kuis di aplikasi ini memotivasi saya untuk belajar lebih giat.',
-              8  => 'Saya aktif mengerjakan materi dan latihan yang ada di aplikasi ini.',
-              9  => 'Saya merasa lebih percaya diri setelah belajar dengan aplikasi ini.',
-              10 => 'Saya merekomendasikan aplikasi ini kepada teman-teman saya.',
-            ];
+            $pertanyaan = \App\Models\Kuesioner::getPertanyaan($kuesioner->jenis);
             $labelSkala = ['','Sangat Tidak Setuju','Tidak Setuju','Netral','Setuju','Sangat Setuju'];
             @endphp
             <h6 class="fw-bold mb-3">Detail Jawaban per Pernyataan</h6>
