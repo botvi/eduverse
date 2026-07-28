@@ -1,3 +1,11 @@
+@php
+    $remainingSeconds = 999999;
+    if (!empty($ujian->jam_selesai)) {
+        $now = \Carbon\Carbon::now('Asia/Jakarta');
+        $jamSelesai = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($ujian->jam_selesai);
+        $remainingSeconds = $jamSelesai->timestamp - $now->timestamp;
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -47,6 +55,8 @@
         .submit-area{text-align:center;margin:40px 0 60px;}
         .btn-submit{background:linear-gradient(135deg,var(--neon-p),var(--neon-r));color:#fff;border:none;padding:16px 50px;border-radius:50px;font-family:'Orbitron',monospace;font-size:1em;font-weight:700;cursor:pointer;letter-spacing:2px;transition:all .3s;box-shadow:0 0 20px rgba(168,85,247,0.3);}
         .btn-submit:hover{transform:translateY(-4px);box-shadow:0 0 30px rgba(168,85,247,0.5);}
+        .timer-container {display:inline-flex;align-items:center;gap:10px;margin-top:20px;padding:8px 24px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.2);border-radius:50px;color:var(--neon-r);font-family:'Orbitron',monospace;font-weight:700;font-size:1.1em;letter-spacing:1px;box-shadow:0 0 15px rgba(244,63,94,0.15);}
+        .btn-submit.disabled {background:#94a3b8;box-shadow:none;cursor:not-allowed;transform:none !important;opacity:0.7;}
     </style>
 </head>
 <body>
@@ -63,7 +73,17 @@
             <span class="meta-chip"><i class="fas fa-book"></i> {{ $ujian->mapel->nama_mapel ?? '-' }}</span>
             <span class="meta-chip"><i class="fas fa-users"></i> Kelas {{ $ujian->mapel->kelas ?? '-' }}</span>
             <span class="meta-chip"><i class="fas fa-list"></i> {{ count($soals) }} Soal</span>
+            @if(!empty($ujian->jam_mulai) && !empty($ujian->jam_selesai))
+                <span class="meta-chip"><i class="fas fa-clock"></i> {{ substr($ujian->jam_mulai, 0, 5) }} - {{ substr($ujian->jam_selesai, 0, 5) }} WIB</span>
+            @endif
         </div>
+        @if(!empty($ujian->jam_selesai))
+            <div class="timer-container">
+                <i class="fas fa-hourglass-half fa-spin"></i>
+                <span id="countdown-label">SISA WAKTU:</span>
+                <span id="countdown-timer">--:--:--</span>
+            </div>
+        @endif
         @if(isset($isRemedial) && $isRemedial)
             <div style="margin-top:14px;display:inline-block;background:rgba(234,179,8,0.15);border:1px solid var(--neon-y);color:var(--neon-y);padding:6px 18px;border-radius:20px;font-size:0.82em;font-weight:700;letter-spacing:1px;">
                 <i class="fas fa-exclamation-triangle"></i> MODE REMEDIAL &mdash; Maks. Nilai 72
@@ -112,5 +132,66 @@
         @endif
     </form>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let remainingSeconds = {{ $remainingSeconds }};
+        const timerLabel = document.getElementById('countdown-label');
+        const timerDisplay = document.getElementById('countdown-timer');
+        const submitBtn = document.querySelector('.btn-submit');
+        const examForm = document.querySelector('form');
+
+        function updateTimer() {
+            if (remainingSeconds <= 0) {
+                if (timerDisplay) {
+                    timerDisplay.textContent = "WAKTU HABIS";
+                    timerDisplay.style.color = "#94a3b8";
+                }
+                if (timerLabel) {
+                    timerLabel.textContent = "UJIAN SELESAI:";
+                }
+                if (submitBtn) {
+                    submitBtn.classList.add('disabled');
+                }
+                return;
+            }
+
+            let hours = Math.floor(remainingSeconds / 3600);
+            let minutes = Math.floor((remainingSeconds % 3600) / 60);
+            let seconds = remainingSeconds % 60;
+
+            let displayHours = hours.toString().padStart(2, '0');
+            let displayMinutes = minutes.toString().padStart(2, '0');
+            let displaySeconds = seconds.toString().padStart(2, '0');
+
+            if (timerDisplay) {
+                timerDisplay.textContent = `${displayHours}:${displayMinutes}:${displaySeconds}`;
+            }
+
+            remainingSeconds--;
+            setTimeout(updateTimer, 1000);
+        }
+
+        if (remainingSeconds !== null && remainingSeconds < 999999) {
+            updateTimer();
+        }
+
+        // Prevent submission and show alert if time has run out
+        function checkTimeAndAlert(e) {
+            if (remainingSeconds <= 0) {
+                e.preventDefault();
+                alert('Waktu ujian telah habis! Anda tidak dapat mengumpulkan jawaban.');
+                return false;
+            }
+        }
+
+        if (examForm) {
+            examForm.addEventListener('submit', checkTimeAndAlert);
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', checkTimeAndAlert);
+        }
+    });
+</script>
 </body>
 </html>

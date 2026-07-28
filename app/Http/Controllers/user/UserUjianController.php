@@ -37,6 +37,14 @@ class UserUjianController extends Controller
             ->where('status', 'dimulai')
             ->firstOrFail();
 
+        if ($ujian->jam_selesai) {
+            $now = \Carbon\Carbon::now('Asia/Jakarta');
+            $jamSelesai = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($ujian->jam_selesai);
+            if ($now->greaterThan($jamSelesai)) {
+                return redirect()->route('user.ujian.index')->with('error', 'Waktu ujian telah berakhir.');
+            }
+        }
+
         $user_id = Auth::id();
 
         // Cek sudah dikerjakan
@@ -59,6 +67,14 @@ class UserUjianController extends Controller
     public function submit(Request $request, $id)
     {
         $ujian = Ujian::where('id', $id)->where('status', 'dimulai')->firstOrFail();
+
+        if ($ujian->jam_selesai) {
+            $now = \Carbon\Carbon::now('Asia/Jakarta');
+            $jamSelesai = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($ujian->jam_selesai);
+            if ($now->greaterThan($jamSelesai)) {
+                return redirect()->route('user.ujian.index')->with('error', 'Waktu ujian telah berakhir.');
+            }
+        }
 
         $user_id = Auth::id();
 
@@ -103,6 +119,14 @@ class UserUjianController extends Controller
             ->where('status', 'dimulai')
             ->firstOrFail();
 
+        if ($ujian->jam_selesai) {
+            $now = \Carbon\Carbon::now('Asia/Jakarta');
+            $jamSelesai = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($ujian->jam_selesai);
+            if ($now->greaterThan($jamSelesai)) {
+                return redirect()->route('user.ujian.index')->with('error', 'Waktu remedial telah berakhir.');
+            }
+        }
+
         $user_id = Auth::id();
 
         // Pastikan siswa sudah punya nilai dan nilainya < 72
@@ -130,6 +154,14 @@ class UserUjianController extends Controller
     public function submitRemedial(Request $request, $id)
     {
         $ujian = Ujian::where('id', $id)->where('status', 'dimulai')->firstOrFail();
+
+        if ($ujian->jam_selesai) {
+            $now = \Carbon\Carbon::now('Asia/Jakarta');
+            $jamSelesai = \Carbon\Carbon::today('Asia/Jakarta')->setTimeFromTimeString($ujian->jam_selesai);
+            if ($now->greaterThan($jamSelesai)) {
+                return redirect()->route('user.ujian.index')->with('error', 'Waktu remedial telah berakhir.');
+            }
+        }
 
         $user_id = Auth::id();
 
